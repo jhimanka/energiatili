@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#ETALLDATA=1 
+#DBURL="http://localhost:8086/write?db=raksila&precision=ms"  
+ETUSER="XXX@example.org"
+ETPW="YYYYY"
+export ETUSER ETPW #DBURL ETALLDATA
+/usr/bin/java -jar /usr/local/sbin/energiatili.jar
