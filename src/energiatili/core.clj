@@ -21,12 +21,12 @@
                                       :password etpw}})
           (:body (client/get "https://www.energiatili.fi/Reporting/CustomerConsumption/UserConsumptionReport"))) x
     (last (re-find #"(?s)var model = (.+});\r\n\r\n +var GraphContext" x)) ; etsi data sivun sisältä
-    (str/replace x #"new Date.([-\d]+)." "$1") ; korjaa rikkinäiset aikaleimat
+    (str/replace x #"new Date.([-\d]+)." "$1")
     (j/read-value x) ; jäsennä JSON
     (mapv #(get-in % ["Series" "Data"]) (get-in x ["Days" "Consumptions"])) ; päiväkohtainen data
-    (mapv (fn [i & args] ; korjataan virheellistä aikaleimaa 3t ja tarvittaessa summataan yö- ja päiväsähköt
-            [(- (first i) 10800000) (if (nil? args) (last i) (+ (last i) (last (first args))))])
-          (first x) (when (vector? (second x)) (second x)))
+    (mapv (fn [i & args] ; korjataan virheellistä aikaleimaa
+            [(- (first i) 10800000) (last i)])
+          (first x))
     (if alldata? x [(last x)]) ; joko koko historia tai viimeisin tieto
     (reduce (fn [acc item]
               (str acc (format "raksilakwh,sensor=kwh value=%.1f %d\n", (last item) (first item)))) "" x)
